@@ -1,0 +1,7 @@
+fabric-client-kv-org1/
+node_modules/
+crypto-config/
+genesis.block
+mychannel.tx
+Org1MSPanchors.tx
+Org2MSPanchors.tx

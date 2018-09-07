@@ -1,0 +1,137 @@
+name: "property-exchange"
+
+x-type: "hlfv1"
+
+description: "Property Exchange Network"
+
+version: "1.0"
+
+channels:
+  mychannel:
+    orderers:
+      - orderer.example.com
+
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.org1.example.com:
+        endorsingPeer: false
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.org2.example.com:
+        endorsingPeer: false
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+    chaincodes:
+      - mycc:v0
+
+organizations:
+  Org1:
+    mspid: Org1MSP
+
+    peers:
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+
+    certificateAuthorities:
+      - ca-org1
+
+    adminPrivateKey:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/be2cf34bcded52634f1015816a44167e15d4d3304a8332c6b4a84a2e67d433d9_sk
+    signedCert:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+      - peer1.org2.example.com
+    certificateAuthorities:
+      - ca-org2
+    adminPrivateKey:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/22a85e06d50c6dcf1ed99e0a9f291bbbada57f862531aa1e5b9f683867488f0a_sk
+    signedCert:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
+
+orderers:
+  orderer.example.com:
+    url: grpcs://localhost:7050
+
+    grpcOptions:
+      ssl-target-name-override: orderer.example.com
+
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
+
+peers:
+  peer0.org1.example.com:
+    url: grpcs://localhost:7051
+
+    eventUrl: grpcs://localhost:7053
+
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.example.com
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+
+  peer1.org1.example.com:
+    url: grpcs://localhost:7056
+    eventUrl: grpcs://localhost:7058
+    grpcOptions:
+      ssl-target-name-override: peer1.org1.example.com
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/ca.crt
+
+  peer0.org2.example.com:
+    url: grpcs://localhost:8051
+    eventUrl: grpcs://localhost:8053
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.example.com
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+
+  peer1.org2.example.com:
+    url: grpcs://localhost:8056
+    eventUrl: grpcs://localhost:8058
+    grpcOptions:
+      ssl-target-name-override: peer1.org2.example.com
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org2.example.com/peers/peer1.org2.example.com/tls/ca.crt
+
+certificateAuthorities:
+  ca-org1:
+    url: https://localhost:7054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
+
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    caName: ca-org1
+
+  ca-org2:
+    url: https://localhost:8054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: src/artifacts/channel/crypto-config/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    caName: ca-org2

@@ -1,0 +1,13 @@
+{
+  "host":"localhost",
+  "port":"3002",
+  "channelName":"mychannel",
+  "CC_SRC_PATH":"/src/artifacts",
+  "eventWaitTime":"30000",
+  "admins":[
+     {
+        "username":"admin",
+        "secret":"adminpw"
+     }
+  ]
+}

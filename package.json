@@ -1,0 +1,27 @@
+{
+  "name": "trading",
+  "version": "1.0.0",
+  "description": "Exposing to APIs for users to interact with hyperledger fabric",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-network": "./startFabric.sh node"
+  },
+  "keywords": [
+    "hyperledger",
+    "fabric",
+    "node"
+  ],
+  "author": "bhavya",
+  "license": "ISC",
+  "dependencies": {
+    "babel-runtime": "6.26.0",
+    "body-parser": "1.18.3",
+    "express": "4.16.3",
+    "fabric-ca-client": "1.2.1",
+    "fabric-client": "1.2.1",
+    "fabric-shim": "1.2.0",
+    "grpc": "1.14.1"
+  }
+}
