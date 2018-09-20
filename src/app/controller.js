@@ -29,33 +29,45 @@ exports.getChannels = async function (req, res, next) {
 }
 
 exports.installChaincode = async function (req, res, next) {
-  const { peers, chaincodeName, chaincodePath, userName, orgName } = req.body;
-  const message = await chaincode.installChaincode(peers, chaincodeName, chaincodePath, userName, orgName);
-  res.send({ status: 200, message });
-}
-
-exports.instantiateChaincode = async function (req, res, next) {
-  const { peers, chaincodeName, userName, orgName, channelName } = req.body;
-  const message = await chaincode.instantiateChaincode(peers, channelName, chaincodeName, userName, orgName);
-  res.send({ status: 200, message });
-}
-
-exports.invokeTransaction = async function (req, res, next) {
   try {
-    const { peers, chaincodeName, userName, orgName, channelName, functionName, args } = req.body;
-    const message = await query.invokeTransaction(peers, channelName, chaincodeName, functionName, args, userName, orgName);
+    const { peers, chaincodeName, chaincodePath, userName, orgName } = req.body;
+    const message = await chaincode.installChaincode(peers, chaincodeName, chaincodePath, userName, orgName);
     res.send({ status: 200, message });
   } catch(err) {
-    res.send({ status: 500, message: err});
+    res.send({ status: 500, message: err });
   }
 }
 
-exports.queryFromChaincode = async function (req, res, next) {
+exports.instantiateChaincode = async function (req, res, next) {
   try {
-    const { peer, chaincodeName, userName, orgName, channelName, functionName, args } = req.body;
-    const message = await query.queryFromChaincode(peer, channelName, chaincodeName, functionName, args, userName, orgName);
+    const { peers, chaincodeName, userName, orgName, channelName } = req.body;
+    const message = await chaincode.instantiateChaincode(peers, channelName, chaincodeName, userName, orgName);
     res.send({ status: 200, message });
   } catch(err) {
-    res.send({ status: 500, message: err});
+    res.send({ status: 500, message: err });
+  }
+}
+
+const requestMethod = (method, entity) => method + entity;
+const create = (entity) => requestMethod('create', entity);
+const fetch = (entity) => requestMethod('query', entity);
+
+exports.createRecord = (entity) => async function (req, res, next) {
+  try {
+    const { peers, chaincodeName, userName, orgName, channelName, args } = req.body;
+    const message = await query.invokeTransaction(peers, channelName, chaincodeName, create(entity), args, userName, orgName);
+    res.send({ status: 200, message });
+  } catch(err) {
+    res.send({ status: 500, message: err });
+  }
+}
+
+exports.fetchRecord = (entity) => async function (req, res, next) {
+  try {
+    const { peer, chaincodeName, userName, orgName, channelName, args } = req.body;
+    const message = await query.queryFromChaincode(peer, channelName, chaincodeName, fetch(entity), args, userName, orgName);
+    res.send({ status: 200, message });
+  } catch(err) {
+    res.send({ status: 500, message: err });
   }
 }

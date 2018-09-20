@@ -14,7 +14,17 @@ routes.get('/channel', controller.getChannels);
 
 routes.post('/chaincode/install', controller.installChaincode);
 routes.post('/chaincode/instantiate', controller.instantiateChaincode);
-routes.post('/chaincode/transact', controller.invokeTransaction);
-routes.post('/chaincode/query', controller.queryFromChaincode);
+
+routes.post('/trader/create', controller.createRecord('Trader'));
+routes.post('/trader/fetch', controller.fetchRecord('Trader'));
+
+routes.post('/company/create', controller.createRecord('Company'));
+routes.post('/company/fetch', controller.fetchRecord('Company'));
+
+routes.post('/share/create', controller.createRecord('Share'));
+routes.post('/share/fetch', controller.fetchRecord('Share'));
+
+routes.post('/saleProposal/create', controller.createRecord('SaleProposal'));
+routes.post('/saleProposal/fetch', controller.fetchRecord('SaleProposal'));
 
 module.exports = routes;

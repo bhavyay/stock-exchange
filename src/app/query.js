@@ -146,9 +146,9 @@ const queryFromChaincode = async function (peer, channelName, chaincodeName, fcn
 		const response_payloads = await channel.queryByChaincode(request);
 		if (response_payloads) {
 			for (let i = 0; i < response_payloads.length; i++) {
-				console.info(args[0]+' now has ' + response_payloads[i].toString('utf8') + ' after the move');
+				console.info(args[0]+' now has ' + response_payloads[i].toString('utf8'));
 			}
-			return args[0]+ ' now has ' + response_payloads[0].toString('utf8') + ' after the move';
+			return JSON.stringify({ user: args[0], payload: response_payloads[0].toString('utf8')});
 		} else {
 			console.error('response_payloads is null');
 			return 'response_payloads is null';
