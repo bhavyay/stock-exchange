@@ -24,7 +24,10 @@ routes.post('/company/fetch', controller.fetchRecord('Company'));
 routes.post('/share/create', controller.createRecord('Share'));
 routes.post('/share/fetch', controller.fetchRecord('Share'));
 
-routes.post('/saleProposal/create', controller.createRecord('SaleProposal'));
-routes.post('/saleProposal/fetch', controller.fetchRecord('SaleProposal'));
+routes.post('/proposal/create', controller.createRecord('Proposal'));
+routes.post('/proposal/fetch', controller.fetchRecord('Proposal'));
+
+routes.post('/transaction/create', controller.createRecord('Trade'));
+routes.post('/transaction/fetch', controller.fetchRecord('Trade'));
 
 module.exports = routes;

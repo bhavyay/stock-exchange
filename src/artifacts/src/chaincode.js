@@ -2,11 +2,19 @@
 const shim = require('fabric-shim');
 const util = require('util');
 
-var SHARE_COUNT = 0;
+let UUID = {
+  share: 0,
+  proposal: 0,
+  trade: 0
+}
 
-const getSharekey = () => {
-  SHARE_COUNT++;
-  return 'SH' + SHARE_COUNT;
+const getUUID = (key) => {
+  UUID[key]++;
+  return key + UUID[key];
+}
+
+const getTradeTypeKey = (key) => {
+  return key + 'Proposals';
 }
 
 const Chaincode = class {
@@ -123,13 +131,16 @@ const Chaincode = class {
       count: args[3]
     }
   
-    const shareKey = getSharekey();
+    const shareKey = getUUID('share');
     await stub.putState(shareKey, Buffer.from(JSON.stringify(share)));
-    const user = await stub.getState(ownerEmail);
+    const userAsBytes = await stub.getState(ownerEmail);
+    console.log('userAsBytes', userAsBytes.toString());
+    const user = JSON.parse(userAsBytes.toString());
+    console.log('user', user)
     const shares = user.shares || [];
     shares.push(shareKey);
     user.shares = shares;
-    await stub.putState(ownerEmail, user);
+    await stub.putState(ownerEmail, Buffer.from(JSON.stringify(user)));
     console.info('============END: ISSUE SHARE ============');
   }
 
@@ -147,6 +158,99 @@ const Chaincode = class {
     console.info(shareAsBytes.toString());
     console.info('============END: QUERY SHARE============');
     return shareAsBytes;
+  }
+
+  async createProposal(stub, args) {
+    console.info('============START: CREATE PROPOSAL ============');
+    if (args.length !== 5) {
+      throw new Error('Incorrect number of arguments. Expecting full proposal details');
+    }
+
+    const proposal = {
+      docType: 'Proposal',
+      company: args[0],
+      trader: args[1],
+      price: args[2],
+      count: args[3],
+      tradeType: args[4]
+    }
+  
+    const proposalKey = getUUID('proposal');
+    await stub.putState(proposalKey, Buffer.from(JSON.stringify(proposal)));
+    const userAsBytes = await stub.getState(proposal.trader);
+    const user = JSON.parse(userAsBytes.toString());
+    const tradeTypeKey = getTradeTypeKey(proposal.tradeType);
+    const proposals = user[tradeTypeKey] || [];
+    proposals.push(proposalKey);
+    user[tradeTypeKey] = proposals;
+    await stub.putState(proposal.trader, Buffer.from(JSON.stringify(user)));
+    console.info('============END: CREATE PROPOSAL ============');
+  }
+
+  async queryProposal(stub, args) {
+    console.info('============START: QUERY SHARE ============');
+    if (args.length !== 1) {
+      throw new Error('Incorrect number of arguments. Expecting proposal id');
+    }
+
+    const proposalId = args[0];
+    const proposalAsBytes = await stub.getState(proposalId);
+    if (!proposalAsBytes || proposalAsBytes.toString().length <= 0) {
+      throw new Error(proposalId + ' does not exist');
+    }
+    console.info(proposalAsBytes.toString());
+    console.info('============END: QUERY SHARE============');
+    return proposalAsBytes;
+  }
+
+  async createTrade(stub, args) {
+    console.info('============START: CREATE TRADE ============');
+    if (args.length !== 5) {
+      throw new Error('Incorrect number of arguments. Expecting full proposal details');
+    }
+
+    const trade = {
+      docType: 'Trade',
+      buyer: args[0],
+      seller: args[1],
+      price: args[2],
+      count: args[3],
+      company: args[4]
+    }
+  
+    const tradeKey = getUUID('trade');
+    await stub.putState(tradeKey, Buffer.from(JSON.stringify(trade)));
+    const sellerAsBytes = await stub.getState(trade.seller);
+    const buyerAsBytes = await stub.getState(trade.buyer);
+    const seller = JSON.parse(sellerAsBytes.toString());
+    const buyer = JSON.parse(buyerAsBytes.toString());
+
+    const sellerTransactions = seller.transactions || [];
+    const buyerTransactions = buyer.transactions || [];
+    sellerTransactions.push(tradeKey);
+    buyerTransactions.push(tradeKey);
+    seller.transactions = sellerTransactions;
+    buyer.transactions = buyerTransactions;
+
+    await stub.putState(trade.seller, Buffer.from(JSON.stringify(seller)));
+    await stub.putState(trade.buyer, Buffer.from(JSON.stringify(buyer)));
+    console.info('============END: CREATE TRADE ============');
+  }
+
+  async queryTrade(stub, args) {
+    console.info('============START: QUERY TRADE ============');
+    if (args.length !== 1) {
+      throw new Error('Incorrect number of arguments. Expecting trade id');
+    }
+
+    const tradeId = args[0];
+    const tradeAsBytes = await stub.getState(tradeId);
+    if (!tradeAsBytes || tradeAsBytes.toString().length <= 0) {
+      throw new Error(tradeId + ' does not exist');
+    }
+    console.info(tradeAsBytes.toString());
+    console.info('============END: QUERY TRADE ============');
+    return tradeAsBytes;
   }
 }
 
